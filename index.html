@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>🎂 Happy Birthday</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen text-center text-white">
+
+  <!-- 3D Background -->
+  <canvas id="bg"></canvas>
+
+  <div id="container" class="bg-white/20 backdrop-blur-lg p-6 rounded-2xl shadow-xl w-11/12 max-w-md">
+    <h1 class="text-3xl font-bold mb-4 text-pink-200">🎉 Happy Birthday 🎉</h1>
+
+    <!-- Steps -->
+    <div id="step1" class="step active">
+      <p class="text-lg mb-4">Hey there! Ready for a special surprise? 💌</p>
+      <button onclick="nextStep()" class="px-4 py-2 bg-pink-500 rounded-lg hover:bg-pink-600 transition">Let's Go 🎁</button>
+    </div>
+
+    <div id="step2" class="step">
+      <p class="text-lg mb-4">Today is your day — full of joy and love! 💖</p>
+      <button onclick="nextStep()" class="px-4 py-2 bg-pink-500 rounded-lg hover:bg-pink-600 transition">Next 💫</button>
+    </div>
+
+    <div id="step3" class="step">
+      <p class="text-lg mb-4">Wishing you endless happiness and laughter 😄</p>
+      <button onclick="nextStep()" class="px-4 py-2 bg-pink-500 rounded-lg hover:bg-pink-600 transition">Next 🌸</button>
+    </div>
+
+    <div id="step4" class="step">
+      <img src="./images/photo.jpg" alt="Memory" class="rounded-xl mx-auto mb-4 w-64 shadow-lg">
+      <p class="text-lg">Here’s to all the memories and many more to come! 💞</p>
+      <button onclick="nextStep()" class="mt-4 px-4 py-2 bg-pink-500 rounded-lg hover:bg-pink-600 transition">Final 🎇</button>
+    </div>
+
+    <div id="step5" class="step">
+      <p class="text-lg mb-4 font-semibold">🎂 Happy Birthday! 🎂</p>
+      <p class="text-pink-200">May your day be filled with love, laughter, and sweet surprises!</p>
+      <button onclick="startConfetti()" class="mt-4 px-4 py-2 bg-pink-500 rounded-lg hover:bg-pink-600 transition">Celebrate 🎊</button>
+    </div>
+
+    <div class="w-full bg-white/40 h-2 mt-6 rounded-full">
+      <div id="progress" class="h-2 bg-pink-400 rounded-full" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function showStep(step) {
+      document.querySelectorAll(".step").forEach(el => el.classList.remove("active"));
+      document.getElementById(`step${step}`).classList.add("active");
+
+      const progress = (step / totalSteps) * 100;
+      document.getElementById("progress").style.width = progress + "%";
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+      }
+    }
+
+    function startConfetti() {
+      confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+    }
+
+    // 3D Hearts Background
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("bg"), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio * 0.8);
+
+    const heartGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const heartMaterial = new THREE.MeshStandardMaterial({ color: 0xff69b4 });
+    const hearts = [];
+
+    for (let i = 0; i < 15; i++) {
+      const heart = new THREE.Mesh(heartGeometry, heartMaterial);
+      heart.position.set((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+      scene.add(heart);
+      hearts.push(heart);
+    }
+
+    const light = new THREE.PointLight(0xffffff, 1);
+    light.position.set(3, 3, 3);
+    scene.add(light);
+
+    camera.position.z = 5;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      hearts.forEach(h => {
+        h.rotation.x += 0.01;
+        h.rotation.y += 0.01;
+      });
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
